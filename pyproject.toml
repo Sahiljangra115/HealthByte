@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "y2-health-nutrition"
+version = "0.1.0"
+description = "Personalized health & nutrition engine (food CV + biometrics + honest insights)"
+authors = ["Owner"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+torch = "*"
+torchvision = "*"
+timm = "*"
+onnx = "*"
+onnxruntime = "*"
+scikit-learn = "*"
+pandas = "*"
+numpy = "*"
+scipy = "*"
+statsmodels = "*"
+fastapi = "*"
+uvicorn = "*"
+mangum = "*"
+pydantic = "*"
+mlflow = "*"
+pillow = "*"
+pyarrow = "*"
+joblib = "*"
+python-multipart = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
+google-api-python-client = "*"
+requests = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+ruff = "*"
+httpx = "*"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B"]
+# B008: FastAPI uses File(...)/Form(...)/Depends(...) in argument defaults by design.
+ignore = ["E501", "B008"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
