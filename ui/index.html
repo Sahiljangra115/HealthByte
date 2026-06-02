@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nutrition & Health Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script>
+    tailwind.config = { darkMode: "class", theme: { extend: { colors: {
+      ink: "#0b0f14", panel: "#121821", edge: "#1f2935", accent: "#34d399" } } } };
+  </script>
+  <style>@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}</style>
+</head>
+<body class="min-h-dvh bg-ink text-slate-200 antialiased">
+  <!-- Persistent, non-negotiable disclaimer -->
+  <div role="note" class="bg-amber-500/10 border-b border-amber-500/30 text-amber-200 text-sm px-4 py-2 text-center">
+    <strong>Not medical advice.</strong> Calories are ranges, insights are correlational (not causal).
+  </div>
+
+  <!-- Single live region: loading + errors are announced to screen readers (aria-live). -->
+  <div id="status" role="status" aria-live="polite"
+       class="max-w-6xl mx-auto px-4 pt-3 text-sm empty:hidden"></div>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <header class="mb-8 flex items-end justify-between flex-wrap gap-3">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-semibold text-white tracking-tight">Health & Nutrition</h1>
+        <p class="text-slate-400 mt-1">Food log, biometric trends, and one honest insight.</p>
+      </div>
+      <label class="text-sm text-slate-400">User
+        <input id="user" value="demo" class="ml-2 rounded-lg bg-panel border border-edge px-3 py-1.5 w-32
+          focus:outline-none focus:ring-2 focus:ring-accent text-slate-100" />
+      </label>
+    </header>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Food -->
+      <section class="bg-panel border border-edge rounded-2xl p-5" aria-labelledby="food-h">
+        <h2 id="food-h" class="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-4">Log food</h2>
+        <label for="food-img" class="block text-sm text-slate-400 mb-1">Food photo</label>
+        <input id="food-img" type="file" accept="image/*"
+          class="block w-full text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0
+                 file:bg-edge file:text-slate-200 file:px-4 file:py-2 file:cursor-pointer hover:file:bg-slate-700" />
+        <button id="analyze" type="button"
+          class="mt-4 w-full min-h-[44px] rounded-lg bg-accent text-ink font-semibold cursor-pointer
+                 hover:bg-emerald-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel
+                 focus:ring-accent disabled:opacity-50">Estimate calories</button>
+        <div id="food-out" class="mt-4 text-sm hidden">
+          <p class="text-white font-medium" id="food-dish"></p>
+          <p class="text-slate-300 mt-1">Estimated <span id="food-kcal" class="tabular-nums text-accent font-semibold"></span> kcal</p>
+          <p class="text-xs text-slate-500 mt-1" id="food-note"></p>
+        </div>
+      </section>
+
+      <!-- Biometrics upload + trend -->
+      <section class="bg-panel border border-edge rounded-2xl p-5 lg:col-span-2" aria-labelledby="bio-h">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="bio-h" class="text-sm font-semibold text-slate-300 uppercase tracking-wide">Biometric trend (24h window)</h2>
+          <label class="text-xs text-slate-400 cursor-pointer hover:text-slate-200">
+            Upload CSV
+            <input id="bio-csv" type="file" accept=".csv" class="hidden" />
+          </label>
+        </div>
+        <canvas id="chart" height="120" aria-label="Heart rate and sleep trend chart" role="img"></canvas>
+        <p id="bio-empty" class="text-sm text-slate-500 mt-3">No data yet. Set consent, then upload a CSV (timestamp, hr, sleep_hours, steps).</p>
+      </section>
+    </div>
+
+    <!-- Insight -->
+    <section class="bg-panel border border-edge rounded-2xl p-5 mt-6" aria-labelledby="insight-h">
+      <h2 id="insight-h" class="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">Personalized insight</h2>
+      <p id="insight" class="text-slate-300">Log a few days to see a correlational insight.</p>
+      <p id="insight-label" class="text-xs text-amber-300/80 mt-2"></p>
+      <button id="refresh" type="button" class="mt-4 text-sm text-accent hover:underline cursor-pointer">Refresh insight</button>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const user = () => $("user").value.trim() || "demo";
+    let chart;
+
+    // One status helper drives the aria-live region: loading and error feedback.
+    const setStatus = (msg, kind = "info") => {
+      const el = $("status");
+      if (!msg) { el.textContent = ""; el.removeAttribute("class"); el.className = "max-w-6xl mx-auto px-4 pt-3 text-sm empty:hidden"; return; }
+      el.textContent = msg;
+      el.className = "max-w-6xl mx-auto px-4 pt-3 text-sm " +
+        (kind === "error" ? "text-rose-300" : "text-slate-400");
+    };
+
+    async function getJSON(url, opts) {
+      const r = await fetch(url, opts);
+      if (!r.ok) throw new Error(`${r.status} ${await r.text().catch(() => "")}`.trim());
+      return r.json();
+    }
+
+    const b64 = (file) => new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(file);
+    });
+
+    async function ensureConsent() {
+      await fetch("/consent", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ user_id: user(), consent: true }) });
+    }
+
+    async function analyze() {
+      const f = $("food-img").files[0];
+      if (!f) { setStatus("Choose a food photo first.", "error"); return; }
+      const btn = $("analyze"); const label = btn.textContent;
+      btn.disabled = true; btn.textContent = "Estimating…"; setStatus("Estimating calories…");
+      try {
+        const fd = new FormData(); fd.append("image_base64", await b64(f));
+        const d = await getJSON("/predict/food", { method: "POST", body: fd });
+        $("food-dish").textContent = (d.dish || "unknown").replace(/_/g, " ");
+        $("food-kcal").textContent = `${d.kcal_range[0]} to ${d.kcal_range[1]}`;
+        $("food-note").textContent = d.limitations_note || "";
+        $("food-out").classList.remove("hidden");
+        setStatus("");
+      } catch (e) {
+        setStatus(`Could not estimate: ${e.message}. Try again.`, "error");
+      } finally { btn.disabled = false; btn.textContent = label; }
+    }
+
+    async function uploadCsv(file) {
+      setStatus("Uploading biometrics…");
+      try {
+        await ensureConsent();
+        const fd = new FormData(); fd.append("user_id", user());
+        fd.append("file", file, file.name);
+        const d = await getJSON("/biometrics/upload", { method: "POST", body: fd });
+        setStatus(`Stored ${d.n_rows} row(s)${d.rejected?.length ? `, ${d.rejected.length} rejected` : ""}.`);
+        await loadTrend(); await loadInsight();
+      } catch (e) {
+        setStatus(`Upload failed: ${e.message}`, "error");
+      }
+    }
+
+    async function loadTrend() {
+      let d;
+      try { d = await getJSON(`/biometrics/${user()}?window_hours=24`); }
+      catch (e) { setStatus(`Could not load trend: ${e.message}`, "error"); return; }
+      const rows = d.rows || [];
+      $("bio-empty").classList.toggle("hidden", rows.length > 0);
+      const labels = rows.map((x) => x.timestamp.slice(11, 16));
+      const hr = rows.map((x) => x.hr), sleep = rows.map((x) => x.sleep_hours);
+      // Meaningful screen-reader summary instead of a generic label (chart a11y).
+      const avg = (a) => a.length ? (a.reduce((s, v) => s + v, 0) / a.length).toFixed(1) : "n/a";
+      $("chart").setAttribute("aria-label",
+        rows.length ? `Last ${rows.length} readings. Average heart rate ${avg(hr)} bpm, average sleep ${avg(sleep)} hours.`
+                    : "No biometric data yet.");
+      if (chart) chart.destroy();
+      chart = new Chart($("chart"), {
+        type: "line",
+        data: { labels, datasets: [
+          { label: "HR (bpm)", data: hr, borderColor: "#34d399", tension: .3 },
+          // Dashed line so the two series are distinguishable without relying on colour alone (a11y).
+          { label: "Sleep (h)", data: sleep, borderColor: "#60a5fa", borderDash: [6, 4], tension: .3, yAxisID: "y1" } ] },
+        options: { responsive: true, plugins: { legend: { labels: { color: "#cbd5e1" } } },
+          scales: { x: { ticks: { color: "#64748b" } }, y: { ticks: { color: "#64748b" } },
+            y1: { position: "right", grid: { drawOnChartArea: false }, ticks: { color: "#64748b" } } } }
+      });
+    }
+
+    async function loadInsight() {
+      const el = $("insight"); el.textContent = "Loading insight…";
+      try {
+        const d = await getJSON(`/insights/${user()}`);
+        el.textContent = d.recommendation?.suggestion || "No insight yet.";
+        const b = d.recommendation?.based_on;
+        $("insight-label").textContent = b ? b.label : (d.recommendation?.disclaimer || "");
+      } catch (e) {
+        el.textContent = "Could not load insight.";
+        $("insight-label").textContent = "";
+        setStatus(`Insight error: ${e.message}`, "error");
+      }
+    }
+
+    $("analyze").addEventListener("click", analyze);
+    $("bio-csv").addEventListener("change", (e) => e.target.files[0] && uploadCsv(e.target.files[0]));
+    $("refresh").addEventListener("click", () => { loadTrend(); loadInsight(); });
+  </script>
+</body>
+</html>
