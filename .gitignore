@@ -15,3 +15,12 @@ mlruns/
 *.parquet
 *.db
 *.sqlite
+
+# web frontends (node)
+node_modules/
+web/**/node_modules/
+web/**/dist/
+web/**/build/
+web/**/.next/
+.env
+*.log

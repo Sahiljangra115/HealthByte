@@ -1,0 +1,249 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Apple Liquid Glass Design System - Exact Tokens */
+  --bg-base: #000000;
+  --bg-elevated: #0a0a0f;
+  
+  /* Apple System Colors */
+  --blue: #0A84FF;
+  --green: #30D158;
+  --red: #FF375F;
+  --orange: #FF9F0A;
+  --purple: #BF5AF2;
+  --teal: #5AC8FA;
+  --yellow: #FFD60A;
+  
+  /* Typography */
+  --text-1: #FFFFFF;
+  --text-2: rgba(255, 255, 255, 0.55);
+  --text-3: rgba(255, 255, 255, 0.28);
+  
+  /* Glass Surface */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  
+  /* Effects */
+  --blur: blur(48px) saturate(180%);
+  --radius-card: 1.5rem;
+  --radius-pill: 9999px;
+  
+  /* Spring Animation */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* Shadcn tokens */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: rgba(255, 255, 255, 0.06);
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.06);
+  --popover-foreground: #ffffff;
+  --primary: #0A84FF;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: rgba(255, 255, 255, 0.55);
+  --accent: rgba(255, 255, 255, 0.1);
+  --accent-foreground: #ffffff;
+  --destructive: #FF375F;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.10);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #0A84FF;
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+}
+
+/* Glass Material - Navbar + Hero Card Only */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-blur {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Specular Highlight */
+.specular-highlight {
+  position: relative;
+}
+
+.specular-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* Dynamic Island Navbar */
+.navbar-island {
+  background: rgba(16, 16, 20, 0.72);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 44px;
+}
+
+/* Atmospheric Orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orb-blue {
+  background: var(--blue);
+  opacity: 0.10;
+  filter: blur(120px);
+}
+
+.orb-green {
+  background: var(--green);
+  opacity: 0.07;
+  filter: blur(100px);
+}
+
+.orb-purple {
+  background: var(--purple);
+  opacity: 0.05;
+  filter: blur(80px);
+}
+
+/* State Vector Orb */
+.state-vector-orb {
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    var(--blue) 30%, 
+    var(--purple) 70%, 
+    var(--teal) 100%
+  );
+  box-shadow: 
+    0 0 60px var(--blue),
+    0 0 100px rgba(191, 90, 242, 0.4),
+    inset 0 0 40px rgba(255, 255, 255, 0.2);
+}
+
+/* Macro Ring */
+.macro-ring {
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+/* Border Glow Effects */
+.glow-blue { box-shadow: 0 0 30px rgba(10, 132, 255, 0.4); }
+.glow-green { box-shadow: 0 0 30px rgba(48, 209, 88, 0.4); }
+.glow-purple { box-shadow: 0 0 30px rgba(191, 90, 242, 0.4); }
+.glow-yellow { box-shadow: 0 0 30px rgba(255, 214, 10, 0.4); }
+
+/* Data Stream Animation */
+@keyframes flowData {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.data-stream-line {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--blue) 30%, 
+    var(--teal) 50%, 
+    var(--purple) 70%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: flowData 2s linear infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Reduce motion support - CSS animations only, Framer Motion handles JS animations via useReducedMotion() */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* Note: transition-duration removed to avoid conflicting with Framer Motion's JS-driven animations */
+  }
+}

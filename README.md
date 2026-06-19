@@ -117,6 +117,13 @@ pytest                                 # consent gate, calorie ranges, correlati
 
 A responsive dark-theme UI (HTML, Tailwind, Chart.js) for food upload, calorie predictions, biometric windows, and live insight updates. Accessibility is built in: ARIA live regions announce status to screen readers, contrast meets accessible thresholds, and the medical disclaimer cannot be dismissed.
 
+## Web frontends
+
+Beyond the single-file dashboard, `web/` holds two richer clients (see `web/README.md`):
+
+- `web/app` — a multi-screen React app (Vite + TypeScript): scan, log, plan, profile.
+- `web/v0-website` — a Next.js marketing landing page built with shadcn/ui.
+
 ## Project layout
 
 ```

@@ -1,0 +1,5 @@
+{
+  "name": "NutriLens",
+  "description": "A spatial nutrition assistant that uses AI to track meals, monitor vitals, and provide personalized health insights.",
+  "requestFramePermissions": ["camera"]
+}
