@@ -10,7 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Repo root is two levels up from this file (src/config.py -> repo root).
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 ARTIFACT_DIR = ROOT / "artifacts"
@@ -29,18 +28,16 @@ class Config:
     food_epochs: int = 5
     food_lr: float = 1e-4
     food_batch_size: int = 32
-    val_frac: float = 0.1  # carved out of the official train split
+    val_frac: float = 0.1
 
-    # Calorie estimator. portion_factor multiplies the dish kcal_std to model
-    # the fact that portion size from a 2D photo is unknown. low_conf_widen
-    # widens the band further when the classifier is unsure of the dish.
+    # Calorie estimator.
     portion_factor: float = 2.0
     low_conf_threshold: float = 0.6
     low_conf_widen: float = 1.5
 
     # Correlation engine.
-    alpha: float = 0.05  # significance level before BH correction
-    min_samples: int = 5  # below this a correlation is not reported
+    alpha: float = 0.05
+    min_samples: int = 5
 
     # Storage.
     db_path: Path = ROOT / "timeseries.db"

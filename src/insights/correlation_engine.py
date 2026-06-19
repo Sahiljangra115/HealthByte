@@ -47,6 +47,5 @@ def correlate(
             row["significant"] = bool(rej)
             row["label"] = f"correlation, not causation; n={n}"
 
-    # Strongest first among the significant ones.
     rows.sort(key=lambda d: (not d["significant"], -abs(d["r"]) if d["r"] == d["r"] else 0))
     return rows

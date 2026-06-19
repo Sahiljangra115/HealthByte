@@ -29,7 +29,6 @@ def build_manifest(val_frac: float = 0.1, out=None) -> pd.DataFrame:
             rows.append({"path": str(path), "label": int(label), "dish": classes[label], "orig": split})
 
     df = pd.DataFrame(rows)
-    # Carve val out of the official train split only, seeded.
     rng = np.random.default_rng(CFG.seed)
     is_train = df["orig"] == "train"
     u = rng.random(len(df))

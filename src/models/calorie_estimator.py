@@ -41,7 +41,6 @@ def estimate(dish: str, class_conf: float) -> dict:
 
     low = max(0.0, base - spread)
     high = base + spread
-    # Guarantee a real interval even if std is tiny.
     if high - low < 1.0:
         high = low + 1.0
 

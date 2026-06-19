@@ -88,8 +88,6 @@ def insights(user: str):
         return InsightResponse(correlations=[], recommendation=recommend([]))
 
     df = pd.DataFrame(rows)
-    # ponytail: correlate the biometrics we have; nutrition features join in once
-    # food logs are richer. Outcomes are the biometric columns.
     nutrition_cols = [c for c in ("steps",) if c in df]
     outcome_cols = [c for c in ("hr", "sleep_hours") if c in df]
     corrs = correlate(df, nutrition_cols, outcome_cols) if nutrition_cols and outcome_cols else []

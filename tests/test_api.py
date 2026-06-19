@@ -14,8 +14,6 @@ def test_health():
 
 
 def test_consent_upload_window_flow(tmpdb):
-    # tmpdb patches src.store.timeseries.CFG to a throwaway db; the endpoints
-    # import that same module, so they share the patched store.
     assert client.post("/consent", json={"user_id": "u1", "consent": True}).status_code == 200
 
     csv = "timestamp,hr,sleep_hours,steps\n2026-06-18T08:00:00,60,7,4000\n2026-06-18T09:00:00,72,7,5000\n"

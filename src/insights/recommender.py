@@ -5,7 +5,6 @@ from __future__ import annotations
 
 from src.config import DISCLAIMER
 
-# Human-readable phrasing per feature. Kept simple on purpose.
 _NICE = {
     "sugar_g": "higher-sugar days",
     "kcal": "higher-calorie days",

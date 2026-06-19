@@ -48,7 +48,7 @@ def _load_creds(user_id: str):
         raise FileNotFoundError(f"no Google Fit token for {user_id}; call authorize() first")
     creds = Credentials.from_authorized_user_info(json.loads(path.read_text()), SCOPES)
     if creds.expired and creds.refresh_token:
-        creds.refresh(Request())  # handle token refresh
+        creds.refresh(Request())
         path.write_text(creds.to_json())
     return creds
 
