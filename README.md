@@ -10,7 +10,7 @@
 [![ONNX](https://img.shields.io/badge/inference-ONNX-005CED.svg)](https://onnxruntime.ai/)
 [![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![SQLite](https://img.shields.io/badge/db-SQLite-003B57.svg)](https://www.sqlite.org/)
-[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF.svg)](https://github.com/features/actions)
+[![CI](https://github.com/Sahiljangra115/HealthByte/actions/workflows/ci.yml/badge.svg)](https://github.com/Sahiljangra115/HealthByte/actions/workflows/ci.yml)
 
 ---
 
